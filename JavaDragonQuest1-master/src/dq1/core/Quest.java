@@ -1,4 +1,4 @@
-s adn classpackage dq1.core;
+package dq1.core;
 
 import java.util.HashMap;
 import java.util.Map;
