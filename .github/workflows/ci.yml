@@ -17,7 +17,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Set up Java 8
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "8"
@@ -29,6 +29,16 @@ jobs:
           find JavaDragonQuest1-master/src -name '*.java' -print0 \
             | xargs -0 javac -encoding UTF-8 -source 1.8 -target 1.8 \
                 -d "$RUNNER_TEMP/java-rpg-classes"
+      - name: Compile and run quest smoke tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/java-rpg-test-classes"
+          find JavaDragonQuest1-master/test -name '*.java' -print0 \
+            | xargs -0 javac -encoding UTF-8 -source 1.8 -target 1.8 \
+                -cp "$RUNNER_TEMP/java-rpg-classes" \
+                -d "$RUNNER_TEMP/java-rpg-test-classes"
+          java -cp "$RUNNER_TEMP/java-rpg-classes:$RUNNER_TEMP/java-rpg-test-classes" dq1.core.QuestSmokeTest
       - name: Check website and documentation
         shell: bash
         run: |
@@ -39,7 +49,7 @@ jobs:
           grep -q 'Training grounds' index.html
           grep -q 'Java RPG' index.html
           grep -q 'JavaDragonQuest1-master/src' README.md
-      - name: Check browser demo scripts parse
+      - name: Check browser demo structure
         shell: bash
         run: |
           set -euo pipefail
